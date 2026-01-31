@@ -1,16 +1,33 @@
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import Database from 'better-sqlite3';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import * as path from 'path';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dbPath = path.join(__dirname, '../../data/vpn.db');
+export interface SubscriptionRow {
+  id: string;
+  stripe_customer_id: string;
+  stripe_subscription_id: string | null;
+  email: string;
+  wg_client_id: string | null;
+  wg_client_name: string | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  expires_at: string | null;
+}
 
-const sqlite = new Database(dbPath);
-sqlite.pragma('journal_mode = WAL');
+@Injectable()
+export class DatabaseService implements OnModuleInit {
+  private db: Database.Database;
 
-export const db = {
-  init() {
-    sqlite.exec(`
+  onModuleInit() {
+    const dbPath = path.join(__dirname, '../../data/vpn.db');
+    this.db = new Database(dbPath);
+    this.db.pragma('journal_mode = WAL');
+    this.init();
+  }
+
+  private init() {
+    this.db.exec(`
       CREATE TABLE IF NOT EXISTS subscriptions (
         id TEXT PRIMARY KEY,
         stripe_customer_id TEXT NOT NULL,
@@ -29,7 +46,7 @@ export const db = {
       CREATE INDEX IF NOT EXISTS idx_email ON subscriptions(email);
     `);
     console.log('✅ Database initialized');
-  },
+  }
 
   createSubscription(data: {
     id: string;
@@ -37,19 +54,27 @@ export const db = {
     stripeSubscriptionId?: string;
     email: string;
   }) {
-    const stmt = sqlite.prepare(`
+    const stmt = this.db.prepare(`
       INSERT INTO subscriptions (id, stripe_customer_id, stripe_subscription_id, email)
       VALUES (?, ?, ?, ?)
     `);
-    return stmt.run(data.id, data.stripeCustomerId, data.stripeSubscriptionId || null, data.email);
-  },
+    return stmt.run(
+      data.id,
+      data.stripeCustomerId,
+      data.stripeSubscriptionId || null,
+      data.email,
+    );
+  }
 
-  updateSubscription(stripeSubscriptionId: string, data: Partial<{
-    status: string;
-    wgClientId: string;
-    wgClientName: string;
-    expiresAt: string;
-  }>) {
+  updateSubscription(
+    stripeSubscriptionId: string,
+    data: Partial<{
+      status: string;
+      wgClientId: string;
+      wgClientName: string;
+      expiresAt: string;
+    }>,
+  ) {
     const fields: string[] = [];
     const values: (string | null)[] = [];
 
@@ -73,45 +98,32 @@ export const db = {
     fields.push('updated_at = CURRENT_TIMESTAMP');
     values.push(stripeSubscriptionId);
 
-    const stmt = sqlite.prepare(`
+    const stmt = this.db.prepare(`
       UPDATE subscriptions 
       SET ${fields.join(', ')}
       WHERE stripe_subscription_id = ?
     `);
     return stmt.run(...values);
-  },
+  }
 
-  getSubscription(stripeSubscriptionId: string) {
-    const stmt = sqlite.prepare(`
+  getSubscription(stripeSubscriptionId: string): SubscriptionRow | undefined {
+    const stmt = this.db.prepare(`
       SELECT * FROM subscriptions WHERE stripe_subscription_id = ?
     `);
     return stmt.get(stripeSubscriptionId) as SubscriptionRow | undefined;
-  },
+  }
 
-  getSubscriptionByEmail(email: string) {
-    const stmt = sqlite.prepare(`
+  getSubscriptionByEmail(email: string): SubscriptionRow | undefined {
+    const stmt = this.db.prepare(`
       SELECT * FROM subscriptions WHERE email = ? ORDER BY created_at DESC LIMIT 1
     `);
     return stmt.get(email) as SubscriptionRow | undefined;
-  },
+  }
 
-  getSubscriptionByCustomerId(customerId: string) {
-    const stmt = sqlite.prepare(`
+  getSubscriptionByCustomerId(customerId: string): SubscriptionRow | undefined {
+    const stmt = this.db.prepare(`
       SELECT * FROM subscriptions WHERE stripe_customer_id = ? ORDER BY created_at DESC LIMIT 1
     `);
     return stmt.get(customerId) as SubscriptionRow | undefined;
-  },
-};
-
-export interface SubscriptionRow {
-  id: string;
-  stripe_customer_id: string;
-  stripe_subscription_id: string | null;
-  email: string;
-  wg_client_id: string | null;
-  wg_client_name: string | null;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  expires_at: string | null;
+  }
 }

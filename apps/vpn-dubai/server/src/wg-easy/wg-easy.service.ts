@@ -1,22 +1,21 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
 
-const WG_EASY_URL = process.env.WG_EASY_URL || 'http://localhost:51821';
-const WG_EASY_USERNAME = process.env.WG_EASY_USERNAME || 'admin';
-const WG_EASY_PASSWORD = process.env.WG_EASY_PASSWORD || '';
-
-class WgEasyClient {
+@Injectable()
+export class WgEasyService {
+  private readonly logger = new Logger(WgEasyService.name);
   private client: AxiosInstance;
 
-  constructor() {
+  constructor(private configService: ConfigService) {
+    const baseURL = this.configService.get('WG_EASY_URL') || 'http://localhost:51821';
+    const username = this.configService.get('WG_EASY_USERNAME') || 'admin';
+    const password = this.configService.get('WG_EASY_PASSWORD') || '';
+
     this.client = axios.create({
-      baseURL: WG_EASY_URL,
-      auth: {
-        username: WG_EASY_USERNAME,
-        password: WG_EASY_PASSWORD,
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      baseURL,
+      auth: { username, password },
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 
@@ -26,10 +25,10 @@ class WgEasyClient {
         name,
         expiresAt: expiresAt?.toISOString(),
       });
-      console.log(`✅ WG client created: ${name} (${response.data.clientId})`);
+      this.logger.log(`✅ WG client created: ${name} (${response.data.clientId})`);
       return response.data;
     } catch (error) {
-      console.error('❌ Failed to create WG client:', error);
+      this.logger.error('❌ Failed to create WG client:', error);
       throw error;
     }
   }
@@ -37,9 +36,9 @@ class WgEasyClient {
   async enableClient(clientId: string): Promise<void> {
     try {
       await this.client.post(`/api/client/${clientId}/enable`);
-      console.log(`✅ WG client enabled: ${clientId}`);
+      this.logger.log(`✅ WG client enabled: ${clientId}`);
     } catch (error) {
-      console.error('❌ Failed to enable WG client:', error);
+      this.logger.error('❌ Failed to enable WG client:', error);
       throw error;
     }
   }
@@ -47,9 +46,9 @@ class WgEasyClient {
   async disableClient(clientId: string): Promise<void> {
     try {
       await this.client.post(`/api/client/${clientId}/disable`);
-      console.log(`✅ WG client disabled: ${clientId}`);
+      this.logger.log(`✅ WG client disabled: ${clientId}`);
     } catch (error) {
-      console.error('❌ Failed to disable WG client:', error);
+      this.logger.error('❌ Failed to disable WG client:', error);
       throw error;
     }
   }
@@ -57,9 +56,9 @@ class WgEasyClient {
   async deleteClient(clientId: string): Promise<void> {
     try {
       await this.client.delete(`/api/client/${clientId}`);
-      console.log(`✅ WG client deleted: ${clientId}`);
+      this.logger.log(`✅ WG client deleted: ${clientId}`);
     } catch (error) {
-      console.error('❌ Failed to delete WG client:', error);
+      this.logger.error('❌ Failed to delete WG client:', error);
       throw error;
     }
   }
@@ -69,7 +68,7 @@ class WgEasyClient {
       const response = await this.client.get(`/api/client/${clientId}/configuration`);
       return response.data;
     } catch (error) {
-      console.error('❌ Failed to get WG client config:', error);
+      this.logger.error('❌ Failed to get WG client config:', error);
       throw error;
     }
   }
@@ -81,16 +80,8 @@ class WgEasyClient {
       });
       return response.data;
     } catch (error) {
-      console.error('❌ Failed to get WG client QR code:', error);
+      this.logger.error('❌ Failed to get WG client QR code:', error);
       throw error;
     }
   }
-
-  getQRCodeUrl(clientId: string): string {
-    // Return the direct URL to the QR code SVG
-    const auth = Buffer.from(`${WG_EASY_USERNAME}:${WG_EASY_PASSWORD}`).toString('base64');
-    return `${WG_EASY_URL}/api/client/${clientId}/qrcode.svg`;
-  }
 }
-
-export const wgEasy = new WgEasyClient();
