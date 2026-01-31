@@ -4,6 +4,7 @@ import { StripeModule } from './stripe/stripe.module';
 import { WgEasyModule } from './wg-easy/wg-easy.module';
 import { DatabaseModule } from './database/database.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
     WgEasyModule,
     StripeModule,
     SubscriptionsModule,
+    AdminModule,
   ],
 })
 export class AppModule {}
