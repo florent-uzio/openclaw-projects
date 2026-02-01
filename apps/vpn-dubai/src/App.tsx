@@ -83,7 +83,7 @@ export default function App() {
   ];
 
   const steps = [
-    { step: 1, title: 'Subscribe', description: 'Enter your email and pay €5/month' },
+    { step: 1, title: 'Subscribe', description: 'Enter your email and pay €6/month' },
     { step: 2, title: 'Get QR Code', description: 'Receive your unique configuration instantly' },
     { step: 3, title: 'Connect', description: 'Scan with WireGuard app and enjoy!' },
   ];
@@ -125,7 +125,7 @@ export default function App() {
               href="#pricing"
               className="px-8 py-4 bg-dubai-gold text-dubai-night font-bold rounded-full hover:bg-dubai-gold/90 transition flex items-center gap-2 text-lg"
             >
-              Start for €5/month <ArrowRight className="w-5 h-5" />
+              Start for €6/month <ArrowRight className="w-5 h-5" />
             </a>
             <span className="text-gray-400">No contracts. Cancel anytime.</span>
           </div>
@@ -191,7 +191,7 @@ export default function App() {
         <div className="max-w-md mx-auto">
           <div className="card-glass p-8 border-dubai-gold/50">
             <div className="text-center mb-8">
-              <span className="text-5xl font-bold">€5</span>
+              <span className="text-5xl font-bold">€6</span>
               <span className="text-gray-400">/month</span>
             </div>
 

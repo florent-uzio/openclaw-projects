@@ -35,8 +35,8 @@ export class AdminService {
       s.status === 'payment_failed' || s.status === 'past_due'
     ).length;
 
-    // Monthly revenue = active subscribers × €5
-    const monthlyRevenue = active * 5;
+    // Monthly revenue = active subscribers × €6
+    const monthlyRevenue = active * 6;
 
     // Recent signups (last 7 days)
     const weekAgo = new Date();
@@ -81,7 +81,7 @@ export class AdminService {
       dailyData.push({
         date: dateStr,
         signups: found?.signups || 0,
-        revenue: (found?.signups || 0) * 5,
+        revenue: (found?.signups || 0) * 6,
       });
     }
 

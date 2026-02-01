@@ -233,7 +233,7 @@ export default function Success() {
               </div>
               <div>
                 <span className="text-gray-400">Price</span>
-                <p className="font-medium">€5/month</p>
+                <p className="font-medium">€6/month</p>
               </div>
             </div>
           </div>

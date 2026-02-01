@@ -229,7 +229,7 @@ export default function App() {
             value={stats ? `€${stats.monthlyRevenue}` : '—'}
             icon={DollarSign}
             color="purple"
-            subtext={stats ? `${stats.active} × €5` : undefined}
+            subtext={stats ? `${stats.active} × €6` : undefined}
           />
         </div>
 
