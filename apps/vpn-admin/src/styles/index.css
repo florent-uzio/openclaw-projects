@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @apply bg-slate-50;
+}
+
+@layer utilities {
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-slate-200;
+  }
+}
