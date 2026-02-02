@@ -31,19 +31,16 @@ git add -A
 git commit -m "release: v$VERSION"
 git tag "v$VERSION"
 
-# Build Docker
-echo "🐳 Building Docker image..."
-docker build \
+# Build Docker (multi-platform for Mac + Synology)
+echo "🐳 Building Docker image (multi-platform)..."
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
   --build-arg APP_VERSION=$VERSION \
   --build-arg BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) \
   -t "$IMAGE_NAME:$VERSION" \
   -t "$IMAGE_NAME:latest" \
+  --push \
   .
-
-# Push Docker
-echo "🚀 Pushing to GitHub Container Registry..."
-docker push "$IMAGE_NAME:$VERSION"
-docker push "$IMAGE_NAME:latest"
 
 # Push git
 echo "📤 Pushing to GitHub..."
