@@ -101,3 +101,14 @@ export const getStats = async (): Promise<Stats> => {
   const { data } = await api.get('/bookmarks/stats');
   return data;
 };
+
+export interface VersionInfo {
+  version: string;
+  buildTime: string;
+  nodeEnv: string;
+}
+
+export const getVersion = async (): Promise<VersionInfo> => {
+  const { data } = await api.get('/version');
+  return data;
+};

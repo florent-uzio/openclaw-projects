@@ -10,7 +10,12 @@
     "build:client": "tsc -p tsconfig.json && vite build",
     "build:server": "nest build",
     "start": "node dist/server/main.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "version:patch": "npm version patch --no-git-tag-version",
+    "version:minor": "npm version minor --no-git-tag-version",
+    "version:major": "npm version major --no-git-tag-version",
+    "docker:build": "docker build --build-arg APP_VERSION=$(node -p \"require('./package.json').version\") --build-arg BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) -t x-bookmarks .",
+    "docker:push": "docker push"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.15",

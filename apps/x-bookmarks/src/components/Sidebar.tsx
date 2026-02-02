@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Folder as FolderIcon, 
   Plus, 
@@ -9,7 +9,7 @@ import {
   Check,
   Inbox
 } from 'lucide-react';
-import { Folder, Stats } from '../services/api';
+import { Folder, Stats, getVersion, VersionInfo } from '../services/api';
 import { useStore } from '../stores/useStore';
 
 interface SidebarProps {
@@ -34,6 +34,11 @@ export function Sidebar({ folders, stats, onCreateFolder, onUpdateFolder, onDele
   const [newFolderColor, setNewFolderColor] = useState(COLORS[0]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [version, setVersion] = useState<VersionInfo | null>(null);
+
+  useEffect(() => {
+    getVersion().then(setVersion).catch(() => {});
+  }, []);
 
   const handleCreateFolder = () => {
     if (newFolderName.trim()) {
@@ -248,6 +253,15 @@ export function Sidebar({ folders, stats, onCreateFolder, onUpdateFolder, onDele
           )}
         </div>
       </nav>
+
+      {/* Version Footer */}
+      {version && (
+        <div className="p-3 border-t border-slate-200 text-center">
+          <p className="text-xs text-slate-400">
+            v{version.version}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

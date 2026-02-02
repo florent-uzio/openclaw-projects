@@ -6,6 +6,7 @@ import { FoldersModule } from './folders/folders.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/auth.guard';
+import { VersionModule } from './version/version.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AuthGuard } from './auth/auth.guard';
     DatabaseModule,
     FoldersModule,
     BookmarksModule,
+    VersionModule,
   ],
   providers: [
     {
