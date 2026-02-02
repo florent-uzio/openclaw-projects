@@ -13,3 +13,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3002
+      # ⚠️ CHANGE THIS PASSWORD!
+      - AUTH_PASSWORD=your-secure-password-here
+      # Random secret for signing tokens (generate with: openssl rand -hex 32)
+      - AUTH_SECRET=change-me-to-random-string

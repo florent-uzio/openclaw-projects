@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, RefreshCw, Bookmark, FolderOpen, Menu, X } from 'lucide-react';
+import { Search, RefreshCw, Bookmark, FolderOpen, Menu, LogOut } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import { TweetCard } from './components/TweetCard';
 import { AddBookmark } from './components/AddBookmark';
+import { Login } from './components/Login';
 import { useStore } from './stores/useStore';
+import { login, verifyToken, logout, isAuthenticated } from './services/auth';
 import {
   getFolders,
   getBookmarks,
@@ -19,6 +21,48 @@ import {
 } from './services/api';
 
 export default function App() {
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+
+  // Check auth on mount
+  useEffect(() => {
+    async function checkAuth() {
+      if (isAuthenticated()) {
+        const valid = await verifyToken();
+        setAuthenticated(valid);
+      }
+      setAuthChecked(true);
+    }
+    checkAuth();
+  }, []);
+
+  const handleLogin = async (password: string) => {
+    const success = await login(password);
+    if (success) {
+      setAuthenticated(true);
+    }
+    return success;
+  };
+
+  // Show loading while checking auth
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center">
+        <RefreshCw className="w-8 h-8 animate-spin text-slate-400" />
+      </div>
+    );
+  }
+
+  // Show login if not authenticated
+  if (!authenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
+
+  // Show main app
+  return <MainApp />;
+}
+
+function MainApp() {
   const queryClient = useQueryClient();
   const { selectedFolderId, searchQuery, setSearchQuery } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -113,7 +157,6 @@ export default function App() {
   };
 
   const handleFolderSelect = () => {
-    // Close sidebar on mobile when folder is selected
     setSidebarOpen(false);
   };
 
@@ -183,6 +226,13 @@ export default function App() {
                   createBookmarkMutation.mutate({ url, folderId, note })
                 }
               />
+              <button
+                onClick={logout}
+                className="p-2 hover:bg-red-50 rounded-lg transition text-slate-400 hover:text-red-500"
+                title="Logout"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
             </div>
           </div>
 
