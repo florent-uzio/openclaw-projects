@@ -5,8 +5,8 @@
 
 set -e
 
-# Config - CHANGE THIS
-GITHUB_USERNAME="florentuzio"
+# Config
+GITHUB_USERNAME="florent-uzio"
 IMAGE_NAME="ghcr.io/$GITHUB_USERNAME/x-bookmarks"
 
 # Get bump type (default: patch)
