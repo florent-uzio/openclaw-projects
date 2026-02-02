@@ -3,6 +3,7 @@ version: '3.8'
 services:
   x-bookmarks:
     image: ghcr.io/florent-uzio/x-bookmarks:latest
+    platform: linux/amd64
     container_name: x-bookmarks
     restart: unless-stopped
     ports:
