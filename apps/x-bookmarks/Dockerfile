@@ -1,5 +1,5 @@
 # Build stage
-FROM node:24-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ RUN npm run build:client
 RUN npm run build:server
 
 # Production stage
-FROM node:24-alpine AS runner
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
@@ -36,9 +36,15 @@ RUN mkdir -p /app/data
 # Expose port
 EXPOSE 3002
 
+# Build args for versioning
+ARG APP_VERSION=0.1.0
+ARG BUILD_TIME
+
 # Set environment
 ENV NODE_ENV=production
 ENV PORT=3002
+ENV APP_VERSION=${APP_VERSION}
+ENV BUILD_TIME=${BUILD_TIME}
 
 # Start server
 CMD ["node", "dist/server/main.js"]
