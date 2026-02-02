@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import Database from 'better-sqlite3';
 import * as path from 'path';
+import * as fs from 'fs';
 
 export interface Folder {
   id: string;
@@ -26,7 +27,12 @@ export class DatabaseService implements OnModuleInit {
   private db: Database.Database;
 
   onModuleInit() {
-    const dbPath = path.join(__dirname, '../../data/bookmarks.db');
+    // Use project root data directory
+    const dataDir = path.join(process.cwd(), 'data');
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+    const dbPath = path.join(dataDir, 'bookmarks.db');
     this.db = new Database(dbPath);
     this.db.pragma('journal_mode = WAL');
     this.init();
