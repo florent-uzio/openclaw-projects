@@ -1,10 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const configService = app.get(ConfigService);
 
@@ -23,6 +25,22 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
+  // Serve static frontend in production
+  if (process.env.NODE_ENV === 'production') {
+    const staticPath = join(__dirname, '..', 'client');
+    app.useStaticAssets(staticPath);
+    app.setBaseViewsDir(staticPath);
+    
+    // Fallback to index.html for SPA routing
+    const express = app.getHttpAdapter().getInstance();
+    express.get('*', (req: any, res: any, next: any) => {
+      if (req.path.startsWith('/api')) {
+        return next();
+      }
+      res.sendFile(join(staticPath, 'index.html'));
+    });
+  }
+
   const port = configService.get('PORT') || 3002;
   await app.listen(port);
 
@@ -30,6 +48,7 @@ async function bootstrap() {
 ╔══════════════════════════════════════════════════════════════╗
 ║                    X Bookmarks Server                        ║
 ╠══════════════════════════════════════════════════════════════╣
+║  URL:      http://localhost:${port}                             ║
 ║  API:      http://localhost:${port}/api                         ║
 ╚══════════════════════════════════════════════════════════════╝
   `);
