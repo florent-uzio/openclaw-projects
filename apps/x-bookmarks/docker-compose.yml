@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  x-bookmarks:
+    image: ghcr.io/florent-uzio/x-bookmarks:latest
+    platform: linux/amd64
+    container_name: x-bookmarks
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    volumes:
+      # Persist database - create this folder first!
+      - /volume1/docker/x-bookmarks/data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      # ⚠️ CHANGE THESE!
+      - AUTH_PASSWORD=your-secure-password-here
+      - AUTH_SECRET=change-me-to-random-string

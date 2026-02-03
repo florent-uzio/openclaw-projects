@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tweet embed styling */
+.react-tweet-theme {
+  --tweet-container-margin: 0;
+}
+
+[data-theme="light"] {
+  --tweet-bg-color: white;
+}
