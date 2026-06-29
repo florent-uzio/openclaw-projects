@@ -1,13 +1,31 @@
 import { Tweet } from 'react-tweet';
 import { Trash2, FolderInput, ExternalLink, MessageSquare } from 'lucide-react';
 import { Bookmark, Folder } from '../services/api';
-import { useState } from 'react';
+import { Component, ReactNode, useState } from 'react';
 
 interface TweetCardProps {
   bookmark: Bookmark;
   folders: Folder[];
   onDelete: (id: string) => void;
   onMove: (id: string, folderId: string | null) => void;
+}
+
+// react-tweet can throw while parsing tweets with an unexpected shape, which
+// would otherwise crash the whole dashboard. This contains the failure to a
+// single card and shows a fallback instead.
+class TweetErrorBoundary extends Component<
+  { children: ReactNode; fallback: ReactNode },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    return this.state.hasError ? this.props.fallback : this.props.children;
+  }
 }
 
 export function TweetCard({ bookmark, folders, onDelete, onMove }: TweetCardProps) {
@@ -17,7 +35,23 @@ export function TweetCard({ bookmark, folders, onDelete, onMove }: TweetCardProp
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-lg transition">
       {/* Tweet Preview */}
       <div className="p-3 sm:p-4">
-        <Tweet id={bookmark.tweet_id} />
+        <TweetErrorBoundary
+          fallback={
+            <div className="text-sm text-slate-400 text-center py-8">
+              Couldn't load this post.{' '}
+              <a
+                href={bookmark.tweet_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                Open on X
+              </a>
+            </div>
+          }
+        >
+          <Tweet id={bookmark.tweet_id} apiUrl={`/api/tweet/${bookmark.tweet_id}`} />
+        </TweetErrorBoundary>
       </div>
 
       {/* Note if exists */}

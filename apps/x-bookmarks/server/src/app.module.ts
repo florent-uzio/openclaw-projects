@@ -7,6 +7,7 @@ import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/auth.guard';
 import { VersionModule } from './version/version.module';
+import { TweetsModule } from './tweets/tweets.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { VersionModule } from './version/version.module';
     FoldersModule,
     BookmarksModule,
     VersionModule,
+    TweetsModule,
   ],
   providers: [
     {
